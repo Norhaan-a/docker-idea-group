@@ -1,13 +1,7 @@
-FROM php:8.1-apache-buster
-
-ENV APACHE_DOCUMENT_ROOT /storage/branches/coutry-info-main
-
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-
-CMD chmod -R 755 /storage/branches/country-info && \
-sed -i -e '$aListen '$PORT'' /etc/apache2/conf-available/docker-php.conf && \
-apache2-foreground
-
-
+FROM php:apache-bullseye
+# Start Apache correctly
+CMD rm -r /var/www/html \
+    && ln -s $(pwd) /var/www/html \
+    && sed -i "s/80/$PORT/" /etc/apache2/sites-enabled/000-default.conf \
+    && sed -i "s/80/$PORT/" /etc/apache2/ports.conf \
+    && apache2-foreground
